@@ -109,7 +109,7 @@ _jsr | this will *mostly* detect that the last jump was return was abs |jslf == 
 For example, you have a function like so
 ~~~
 myButeFunc_aXY
-    LDA #$04
+	LDA #$04
 	STA $2100
 	RTS
 ~~~~
@@ -117,7 +117,7 @@ And you assume, beleive and hope that when anything calls this A will be 8 bits 
 ~~~
 myButeFunc_aXY
 _ASSERT_a8
-    LDA #$04
+	LDA #$04
 	STA $2100
 	RTS
 ~~~~
