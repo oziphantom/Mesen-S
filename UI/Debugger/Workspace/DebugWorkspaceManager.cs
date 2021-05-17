@@ -132,12 +132,16 @@ namespace Mesen.GUI.Debugger.Workspace
 				string dbgPath = Path.Combine(romFolder, romName + ".dbg");
 				string mslPath = Path.Combine(romFolder, romName + ".msl");
 				string symPath = Path.Combine(romFolder, romName + ".sym");
-				if(File.Exists(dbgPath)) {
+				string tassPath = Path.Combine(romFolder, romName + ".tass");
+				if (File.Exists(dbgPath)) {
 					ImportDbgFile(dbgPath, true);
 				} else if(File.Exists(mslPath)) {
 					ImportMslFile(mslPath, true);
 				} else if(File.Exists(symPath)) {
 					ImportSymFile(symPath, true);
+				} else if(File.Exists(tassPath))
+				{
+					ImportSymFile(tassPath, true);
 				}
 			}
 		}
@@ -157,20 +161,36 @@ namespace Mesen.GUI.Debugger.Workspace
 				ResetLabels();
 			}
 
-			string symContent = File.ReadAllText(symPath);
-			if(symContent.Contains("[labels]")) {
-				//Assume WLA-DX symbol files
-				new WlaDxImporter().Import(symPath, silent);
-			} else {
-				RomInfo romInfo = EmuApi.GetRomInfo();
-				if(romInfo.CoprocessorType == CoprocessorType.Gameboy || romInfo.CoprocessorType == CoprocessorType.SGB) {
-					if(RgbdsSymbolFile.IsValidFile(symPath)) {
-						RgbdsSymbolFile.Import(symPath, silent);
-					} else {
+			if (symPath.EndsWith(".tass"))
+			{
+				Tass64DumpLabels.Import(symPath, silent);
+			}
+			else
+			{
+				string symContent = File.ReadAllText(symPath);
+				if (symContent.Contains("[labels]"))
+				{
+					//Assume WLA-DX symbol files
+					new WlaDxImporter().Import(symPath, silent);
+				}
+				else
+				{
+					RomInfo romInfo = EmuApi.GetRomInfo();
+					if (romInfo.CoprocessorType == CoprocessorType.Gameboy || romInfo.CoprocessorType == CoprocessorType.SGB)
+					{
+						if (RgbdsSymbolFile.IsValidFile(symPath))
+						{
+							RgbdsSymbolFile.Import(symPath, silent);
+						}
+						else
+						{
+							BassLabelFile.Import(symPath, silent);
+						}
+					}
+					else
+					{
 						BassLabelFile.Import(symPath, silent);
 					}
-				} else {
-					BassLabelFile.Import(symPath, silent);
 				}
 			}
 			LabelManager.RefreshLabels();

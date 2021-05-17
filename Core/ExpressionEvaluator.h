@@ -102,6 +102,10 @@ enum EvalValues : int64_t
 	RegDE = 20000000169,
 	RegHL = 20000000170,
 
+	DP = 20000000171,
+	DBR = 20000000172,
+	JSLF = 20000000173,
+
 	FirstLabelIndex = 20000002000,
 };
 

@@ -804,7 +804,7 @@ namespace Mesen.GUI.Debugger
 		private void mnuImportLabels_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog ofd = new OpenFileDialog();
-			ofd.SetFilter("All supported files (*.dbg, *.msl, *.sym)|*.dbg;*.msl;*.sym");
+			ofd.SetFilter("All supported files (*.dbg, *.msl, *.sym, *.tass)|*.dbg;*.msl;*.sym;*.tass");
 			if(ofd.ShowDialog() == DialogResult.OK) {
 				ImportLabelFile(ofd.FileName);
 				RefreshDisassembly();
@@ -816,7 +816,7 @@ namespace Mesen.GUI.Debugger
 			string ext = Path.GetExtension(path).ToLower();
 			if(ext == ".msl") {
 				DebugWorkspaceManager.ImportMslFile(path);
-			} else if(ext == ".sym") {
+			} else if(ext == ".sym" || ext ==".tass") {			
 				DebugWorkspaceManager.ImportSymFile(path);
 			} else {
 				DebugWorkspaceManager.ImportDbgFile(path);

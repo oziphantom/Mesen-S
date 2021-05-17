@@ -143,7 +143,7 @@ namespace Mesen.GUI.Debugger
 				"Most expressions/operators are accepted (C++ syntax)." + Environment.NewLine +
 				"Note: Use the $ prefix to denote hexadecimal values." + Environment.NewLine + Environment.NewLine +
 				//"Note 2: Labels assigned to the code can be used (their value will match the label's address in CPU memory)." + Environment.NewLine + Environment.NewLine +
-				"A/X/Y/PS/SP: Value of registers" + Environment.NewLine +
+				"A/X/Y/PS/SP/DP/DBR: Value of registers" + Environment.NewLine +
 				"PC: Program Counter" + Environment.NewLine +
 				"OpPC: Address of the current instruction's first byte" + Environment.NewLine +
 				"PreviousOpPC: Address of the previous instruction's first byte" + Environment.NewLine +

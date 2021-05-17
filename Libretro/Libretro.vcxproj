@@ -31,7 +31,7 @@
     <ProjectGuid>{4432139E-528B-44DE-961C-B37CD5E92E0E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Libretro</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectName>Libretro</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

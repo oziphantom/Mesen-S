@@ -105,41 +105,51 @@ shared_ptr<BaseCartridge> BaseCartridge::CreateCartridge(Console* console, Virtu
 
 int32_t BaseCartridge::GetHeaderScore(uint32_t addr)
 {
+	LogDebug("Get header Score" + HexUtilities::ToHex(addr));
 	//Try to figure out where the header is by using a scoring system
 	if(_prgRomSize < addr + 0x7FFF) {
 		return -1;
 	}
-
+	LogDebug("passed size test");
 	SnesCartInformation cartInfo;
 	memcpy(&cartInfo, _prgRom + addr + 0x7FB0, sizeof(SnesCartInformation));
 	
 	uint32_t score = 0;
 	uint8_t mode = (cartInfo.MapMode & ~0x10);
+	LogDebug("mode = "+ HexUtilities::ToHex(mode));
 	if((mode == 0x20 || mode == 0x22) && addr < 0x8000) {
+		LogDebug("mode 20 pass");
 		score++;
 	} else if((mode == 0x21 || mode == 0x25) && addr >= 0x8000) {
+		LogDebug("mode 21 pass");
 		score++;
 	}
 
 	if(cartInfo.RomType < 0x08) {
+		LogDebug("rom < 8");
 		score++;
 	}
 	if(cartInfo.RomSize < 0x10) {
+		LogDebug("rom size < 10");
 		score++;
 	}
 	if(cartInfo.SramSize < 0x08) {
+		LogDebug("sram < 8");
 		score++;
 	}
 
 	uint16_t checksum = cartInfo.Checksum[0] | (cartInfo.Checksum[1] << 8);
 	uint16_t complement = cartInfo.ChecksumComplement[0] | (cartInfo.ChecksumComplement[1] << 8);
 	if(checksum + complement == 0xFFFF && checksum != 0 && complement != 0) {
+		LogDebug("checksum pass");
 		score += 8;
 	}
 
 	uint32_t resetVectorAddr = addr + 0x7FFC;
 	uint32_t resetVector = _prgRom[resetVectorAddr] | (_prgRom[resetVectorAddr + 1] << 8);
+	LogDebug("reset vector = " + HexUtilities::ToHex(resetVector));
 	if(resetVector < 0x8000) {
+		LogDebug("reset vector fail");
 		return -1;
 	}
 	
@@ -147,12 +157,16 @@ int32_t BaseCartridge::GetHeaderScore(uint32_t addr)
 	if(op == 0x18 || op == 0x78 || op == 0x4C || op == 0x5C || op == 0x20 || op == 0x22 || op == 0x9C) {
 		//CLI, SEI, JMP, JML, JSR, JSl, STZ
 		score += 8;
+		LogDebug("good instruction");
 	} else if(op == 0xC2 || op == 0xE2 || op == 0xA9 || op == 0xA2 || op == 0xA0) {
 		//REP, SEP, LDA, LDX, LDY
 		score += 4;
+		LogDebug("okay instruction");
 	} else if(op == 0x00 || op == 0xFF || op == 0xCC) {
 		//BRK, SBC, CPY
 		score -= 8;
+
+		LogDebug("bad instruction");
 	}
 
 	return std::max<int32_t>(0, score);

@@ -10,6 +10,7 @@
 #include "LabelManager.h"
 #include "DebugUtilities.h"
 #include "../Utilities/HexUtilities.h"
+#include "MessageManager.h"
 
 const vector<string> ExpressionEvaluator::_binaryOperators = { { "*", "/", "%", "+", "-", "<<", ">>", "<", "<=", ">", ">=", "==", "!=", "&", "^", "|", "&&", "||" } };
 const vector<int> ExpressionEvaluator::_binaryPrecedence = { { 10,  10,  10,   9,   9,    8,    8,   7,   7,    7,    7,    6,    6,   5,   4,   3,    2,    1 } };
@@ -110,6 +111,7 @@ bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t &pos, str
 
 int64_t ExpressionEvaluator::ProcessCpuSpcTokens(string token)
 {
+	LogDebug(token);
 	if(token == "a") {
 		return EvalValues::RegA;
 	} else if(token == "x") {
@@ -130,6 +132,13 @@ int64_t ExpressionEvaluator::ProcessCpuSpcTokens(string token)
 		return EvalValues::Irq;
 	} else if(token == "nmi") {
 		return EvalValues::Nmi;
+	} else if (token == "dp") {
+		return EvalValues::DP;
+	} else if (token == "dbr") {
+		LogDebug("DBR parsed");
+		return EvalValues::DBR;
+	} else if (token == "jslf") {
+		return EvalValues::JSLF;
 	}
 	return -1;
 }
@@ -462,8 +471,10 @@ int32_t ExpressionEvaluator::Evaluate(ExpressionData &data, DebugState &state, E
 		int64_t token = data.RpnQueue[i];
 
 		if(token >= EvalValues::RegA) {
+			LogDebug("token" + std::to_string(token));
 			//Replace value with a special value
 			if(token >= EvalValues::FirstLabelIndex) {
+				LogDebug("token over first label");
 				int64_t labelIndex = token - EvalValues::FirstLabelIndex;
 				if((size_t)labelIndex < data.Labels.size()) {
 					token = _labelManager->GetLabelRelativeAddress(data.Labels[(uint32_t)labelIndex], _cpuType);
@@ -481,6 +492,7 @@ int32_t ExpressionEvaluator::Evaluate(ExpressionData &data, DebugState &state, E
 					return 0;
 				}
 			} else {
+				LogDebug("doing switch token");
 				switch(token) {
 					/*case EvalValues::RegOpPC: token = state.Cpu.DebugPC; break;*/
 					case EvalValues::PpuFrameCount: token = _cpuType == CpuType::Gameboy ? state.Gameboy.Ppu.FrameCount : state.Ppu.FrameCount; break;
@@ -494,6 +506,7 @@ int32_t ExpressionEvaluator::Evaluate(ExpressionData &data, DebugState &state, E
 					//case EvalValues::PreviousOpPC: token = state.CPU.PreviousDebugPC; break;
 
 					default:
+						LogDebug("doing switch token by CPU");
 						switch(_cpuType) {
 							case CpuType::Cpu:
 							case CpuType::Sa1:
@@ -506,6 +519,9 @@ int32_t ExpressionEvaluator::Evaluate(ExpressionData &data, DebugState &state, E
 									case EvalValues::RegPC: token = state.Cpu.PC; break;
 									case EvalValues::Nmi: token = state.Cpu.NmiFlag; resultType = EvalResultType::Boolean; break;
 									case EvalValues::Irq: token = state.Cpu.IrqSource != 0; resultType = EvalResultType::Boolean; break;
+									case EvalValues::DP: token = state.Cpu.D; break;
+									case EvalValues::DBR: token = state.Cpu.DBR; LogDebug("DBR: = " + HexUtilities::ToHex(state.Cpu.DBR)); break;
+									case EvalValues::JSLF: token = state.Cpu.JSLF & 1; break; 
 								}
 								break;
 

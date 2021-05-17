@@ -408,6 +408,7 @@ void Cpu::JSL()
 	PushWord(_state.PC - 1);
 	_state.K = (_operand >> 16) & 0xFF;
 	_state.PC = (uint16_t)_operand;
+	_state.JSLF |= 1;
 	IdleEndJump();
 }
 
@@ -415,6 +416,7 @@ void Cpu::JSR()
 {
 	PushWord(_state.PC - 1);
 	_state.PC = (uint16_t)_operand;
+	_state.JSLF &= ~1;
 	IdleEndJump();
 }
 
@@ -432,6 +434,7 @@ void Cpu::RTI()
 		_state.K = PopByte();
 	}
 	IdleEndJump();
+	_state.JSLF = _state.JSLF >> 1;
 }
 
 void Cpu::RTL()
@@ -487,6 +490,7 @@ void Cpu::ProcessInterrupt(uint16_t vector, bool forHardwareInterrupt)
 		_state.K = 0;
 		_state.PC = ReadVector(vector);
 	}
+	_state.JSLF = _state.JSLF << 1;
 }
 
 void Cpu::BRK()

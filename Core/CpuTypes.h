@@ -49,6 +49,9 @@ struct CpuState
 	uint8_t IrqSource;
 	uint8_t PrevIrqSource;
 	CpuStopState StopState;
+
+	/* Ozi ASSERT hack*/
+	uint16_t JSLF; //this is true if the last JSR/L was and L, and false if it was a JSR. It is shifted << 1 on IRQ/NMI and >> 1 on RTI ( it mostly works) always check the lowest bit
 };
 
 namespace ProcFlags

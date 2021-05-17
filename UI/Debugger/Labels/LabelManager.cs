@@ -11,7 +11,7 @@ namespace Mesen.GUI.Debugger.Labels
 {
 	public class LabelManager
 	{
-		public static Regex LabelRegex { get; } = new Regex("^[@_a-zA-Z]+[@_a-zA-Z0-9]*$", RegexOptions.Compiled);
+		public static Regex LabelRegex { get; } = new Regex("^[@_a-zA-Z]+[@_.a-zA-Z0-9]*$", RegexOptions.Compiled);
 		public static Regex AssertRegex { get; } = new Regex(@"assert\((.*)\)", RegexOptions.Compiled);
 
 		private static Dictionary<UInt64, CodeLabel> _labelsByKey = new Dictionary<UInt64, CodeLabel>();
