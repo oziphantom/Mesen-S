@@ -71,6 +71,7 @@ namespace Mesen.GUI
 		public byte IrqSource;
 		public byte PrevIrqSource;
 		public CpuStopState StopState;
+	   public UInt16 JSLF;
 	}
 
 	public struct PpuState
